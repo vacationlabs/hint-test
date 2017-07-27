@@ -35,11 +35,17 @@ main = do
 
   case x of
     Left e -> putStrLn ("Error while running the interpreter: " ++ (show e))
-    Right renderViaPlugin -> defaultMain
-      [
-        bench "without hint" $ nfIO $ generateMarkup foliage
-      , bench "with hint" $ nfIO $ generateMarkup renderViaPlugin
-      ]
+    Right renderViaPlugin -> do
+
+      -- NOTE: Just to ensure that the interpretation has been fully evaluated
+      -- before we get into the benchmark
+      _ <- generateMarkup renderViaPlugin
+
+      defaultMain
+        [
+          bench "without hint" $ nfIO $ generateMarkup foliage
+        , bench "with hint" $ nfIO $ generateMarkup renderViaPlugin
+        ]
 
 generateMarkup :: (UTCTime -> Html) -> IO ()
 generateMarkup renderFn = void $ forM [1..10] $ const $ do
