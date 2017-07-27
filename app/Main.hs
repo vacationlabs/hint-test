@@ -1,50 +1,32 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE MagicHash, UnboxedTuples #-}
 
 module Main where
 
--- import Lib
-import Language.Haskell.Interpreter
-import Criterion.Main
-import Data.Time
-import Markup
-import Text.Blaze.Html5 hiding (main)
-import Text.Blaze.Html.Renderer.String
-import Control.Monad
+import GHC.Exts         ( addrToAny# )
+import GHC.Ptr          ( Ptr(..) )
+import System.Info      ( os, arch )
+import Encoding
+import GHCi.ObjLink
+import Debug.Trace
 
 main :: IO ()
 main = do
-  x <- runInterpreter $ do
-    spath <- get searchPath
-    -- set [installedModulesInScope := True]
-    liftIO $ putStrLn ("SEARCH PATH: " ++ (show spath))
-    loadModules ["app/PluginMarkup.hs"]
-    liftIO $ putStrLn "after loadmodules"
-    setImportsQ
-      [
-        ("Prelude", Nothing)
-      , ("Data.Monoid", Nothing)
-      , ("Text.Blaze.Html5", Nothing)
-      , ("Text.Blaze.Html5.Attributes", Nothing)
-      , ("Data.Time", Nothing)
-      , ("PluginMarkup", Nothing)
-      , ("Text.Blaze.Internal", Nothing)
-      ]
-    liftIO $ putStrLn "after setImportsQ"
-    renderViaPlugin <- interpret "foliage" (as :: UTCTime -> Html)
-    return renderViaPlugin
+  traceM "before initObjLinker"
+  initObjLinker
+  traceM "before loadObj"
+  loadObj "/Users/saurabhnanda/projects/test-plugins/test-plugins/app/PluginMarkup.o"
+  traceM "after loadObj"
 
-  case x of
-    Left e -> putStrLn ("Error while running the interpreter: " ++ (show e))
-    Right renderViaPlugin -> defaultMain
-      [
-        bench "without hint" $ nfIO $ generateMarkup foliage
-      , bench "with hint" $ nfIO $ generateMarkup renderViaPlugin
-      ]
+  -- NOTE: I've hardcoded the symbol name that I obtained from running `symbols PluginMarkup.o`
+  sym <- lookupSymbol "PluginMarkup_foliage_info"
+  traceM "after lookupsymbol"
+  traceM (show sym)
 
-generateMarkup :: (UTCTime -> Html) -> IO ()
-generateMarkup renderFn = void $ forM [1..10] $ const $ do
-  tm <- getCurrentTime
-  writeFile "/tmp/output.html" (renderHtml $ renderFn tm) 
+-- generateMarkup :: (UTCTime -> Html) -> IO ()
+-- generateMarkup renderFn = void $ forM [1..10] $ const $ do
+--   tm <- getCurrentTime
+--   writeFile "/tmp/output.html" (renderHtml $ renderFn tm) 
 
 
 -- [
