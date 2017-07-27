@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Markup where
+module PluginMarkup where
 
 import Prelude
 import qualified Prelude as P
