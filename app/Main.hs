@@ -6,42 +6,48 @@ module Main where
 import Language.Haskell.Interpreter
 import Criterion.Main
 import Data.Time
-import Markup
-import Text.Blaze.Html5 hiding (main)
-import Text.Blaze.Html.Renderer.String
+-- import Markup
+-- import Text.Blaze.Html5 hiding (main)
+-- import Text.Blaze.Html.Renderer.String
 
 
 main :: IO ()
 main = do
   x <- runInterpreter $ do
     spath <- get searchPath
-    set [installedModulesInScope := True]
+    -- set [installedModulesInScope := True]
     liftIO $ putStrLn ("SEARCH PATH: " ++ (show spath))
+    liftIO $ putStrLn "before setImportsQ"
+    loadModules ["app/MyPlugin.hs"]
     setImportsQ
       [
         ("Prelude", Nothing)
       , ("Data.Monoid", Nothing)
-      -- , ("Text.Blaze.Html5", Nothing)
-      -- , ("Text.Blaze.Html5.Attributes", Nothing)
       , ("Data.Time", Nothing)
+      , ("MyPlugin", Nothing)
       ]
-    loadModules ["app/PluginMarkup.hs"]
-    setImportsQ [("PluginMarkup", Nothing)]
-    renderViaPlugin <- interpret "foliage" (as :: UTCTime -> Html)
+    liftIO $ putStrLn "before loadModules"
+    -- setImportsQ [("MyPlugin", Nothing)]
+    renderViaPlugin <- interpret "foo" (as :: IO [UTCTime])
     return renderViaPlugin
 
   case x of
     Left e -> putStrLn ("Error while running the interpreter: " ++ (show e))
-    Right renderViaPlugin -> defaultMain
+    Right fooViaPlugin -> defaultMain
       [
-        bench "without hint" $ nfIO $ generateMarkup foliage
-      , bench "with hint" $ nfIO $ generateMarkup renderViaPlugin
+        bench "without hint" $ nfIO $ foo 
+      , bench "with hint" $ nfIO $ fooViaPlugin
       ]
 
-generateMarkup :: (UTCTime -> Html) -> IO ()
-generateMarkup renderFn = do
-  tm <- getCurrentTime
-  writeFile "/tmp/output.html" (renderHtml $ renderFn tm) 
+foo :: IO [UTCTime]
+foo = do
+  x <- getCurrentTime
+  return $ zipWith (\tm d -> addUTCTime (fromIntegral d) tm) (replicate 10000 x) [1..]
+
+-- generateMarkup :: (UTCTime -> Html) -> IO ()
+-- generateMarkup renderFn = do
+--   tm <- getCurrentTime
+--   writeFile "/tmp/output.html" (renderHtml $ renderFn tm) 
 
 
 -- [
