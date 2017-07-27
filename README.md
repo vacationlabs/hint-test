@@ -1,1 +1,7 @@
-# test-plugins
+Output:
+
+```
+SEARCH PATH: ["."]
+Error while running the interpreter: WontCompile [GhcError {errMsg = "app/PluginMarkup.hs:9:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5\8217\n    Use -v to see a list of the files searched for."},GhcError {errMsg = "app/PluginMarkup.hs:10:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5\8217\n    Use -v to see a list of the files searched for."},GhcError {errMsg = "app/PluginMarkup.hs:11:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5.Attributes\8217\n    Use -v to see a list of the files searched for."},GhcError {errMsg = "app/PluginMarkup.hs:12:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5.Attributes\8217\n    Use -v to see a list of the files searched for."},GhcError {errMsg = "app/PluginMarkup.hs:9:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5\8217\n    Use -v to see a list of the files searched for."},GhcError {errMsg = "app/PluginMarkup.hs:10:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5\8217\n    Use -v to see a list of the files searched for."},GhcError {errMsg = "app/PluginMarkup.hs:11:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5.Attributes\8217\n    Use -v to see a list of the files searched for."},GhcError {errMsg = "app/PluginMarkup.hs:12:1: error:\n    Failed to load interface for \8216Text.Blaze.Html5.Attributes\8217\n    Use -v to see a list of the files searched for."}]
+```
+
